@@ -30,11 +30,6 @@
             <optional>true</optional> <!-- 表示依赖不会传递 -->
         </dependency>
 
-
-
-
-
-       
         <!-- 核心模块-->
         <dependency>
             <groupId>com.vincent78</groupId>
@@ -42,7 +37,6 @@
         </dependency>
 
         <!-- 核心模块-->
-        
         <dependency>
             <groupId>com.vincent78</groupId>
             <artifactId>jvm-framework</artifactId>
