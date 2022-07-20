@@ -11,7 +11,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @author ivan
  */
-@SpringBootApplication(scanBasePackages = {"com.vincent78.jvm.framework"})
+@SpringBootApplication(scanBasePackages = {"com.vincent78.jvm.framework","com.vincent78.jvm.admin"})
 @Slf4j
 public class JVMApplication {
   public static void main(String[] args) {

@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
  * @author ivan
  */
 @RestController
-@RequestMapping("/monitor/server")
+@RequestMapping("/monitor")
 public class ServerController
 {
-    @GetMapping()
+    @GetMapping("/info")
     public AjaxResult getInfo() throws Exception
     {
         Server server = new Server();
