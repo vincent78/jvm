@@ -105,12 +105,6 @@ public class Constants
 
 
     /**
-     * 用户头像
-     */
-    public static final String JWT_AVATAR = "avatar";
-    public static final String THEME = "/angeek/profile/";
-
-    /**
      * 创建时间
      */
     public static final String JWT_CREATED = "created";

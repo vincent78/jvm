@@ -35,6 +35,10 @@
             <groupId>com.vincent78</groupId>
             <artifactId>jvm-framework</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.vincent78</groupId>
+            <artifactId>jvm-common</artifactId>
+        </dependency>
 
         <!-- 核心模块-->
         <dependency>
