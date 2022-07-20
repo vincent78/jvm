@@ -11,20 +11,20 @@ import org.springframework.context.ApplicationContext;
  *
  * @author ivan
  */
-@SpringBootApplication(scanBasePackages = {"com.vincent78.jvm.framework","com.vincent78.jvm.admin"})
+@SpringBootApplication(scanBasePackages = {"com.vincent78.jvm.framework", "com.vincent78.jvm.admin", "com.vincent78.jvm.common"})
 @Slf4j
 public class JVMApplication {
-  public static void main(String[] args) {
-    ApplicationContext context =
-            new SpringApplicationBuilder(JVMApplication.class)
-                    .web(WebApplicationType.SERVLET)
-                    .build()
-                    .run(args);
-    for (String n : context.getBeanDefinitionNames()) {
-      log.info("Instance bean is {}", n);
-    }
+    public static void main(String[] args) {
+        ApplicationContext context =
+                new SpringApplicationBuilder(JVMApplication.class)
+                        .web(WebApplicationType.SERVLET)
+                        .build()
+                        .run(args);
+        for (String n : context.getBeanDefinitionNames()) {
+            log.info("Instance bean is {}", n);
+        }
 
-    log.info("{}", " ------啓動完成-------");
-  }
+        log.info("{}", " ------啓動完成-------");
+    }
 
 }
