@@ -97,7 +97,7 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <version>1.4.13</version>
                 <configuration>
-                    <repository>${project.artifactId}</repository>
+                    <repository>registry.cn-shanghai.aliyuncs.com/vincent78/jvm</repository>
                     <contextDirectory>./</contextDirectory>
                     <tag>${project.version}</tag>
                     <buildArgs>
