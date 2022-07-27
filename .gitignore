@@ -27,3 +27,5 @@ jvm-parent/.idea/jarRepositories.xml
 jvm-parent/.idea/misc.xml
 jvm-parent/.idea/uiDesigner.xml
 jvm-parent/.idea/vcs.xml
+.flattened-pom.xml
+**/target/**
