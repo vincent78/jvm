@@ -19,7 +19,9 @@ public class JVMInfoServiceImpl implements JVMInfoService {
     private NumberFormat fmtI = new DecimalFormat("###,###", new DecimalFormatSymbols(Locale.ENGLISH));
     private NumberFormat fmtD = new DecimalFormat("###,##0.000", new DecimalFormatSymbols(Locale.ENGLISH));
 
-    private final int Kb = 1024;
+    private final int UnitKb = 1024;
+
+    private final int UnitMb = UnitKb * 1024;
 
     //获取JVM的启动时间，版本及名称，当前进程ID,环境变量等
     public JSONObject getRuntime() {
@@ -56,36 +58,37 @@ public class JVMInfoServiceImpl implements JVMInfoService {
     }
 
     //获取JVM内存使用状况，包括堆内存和非堆内存
-    public JSONObject getMem() {
+    public JSONObject getMem(int unit) {
         JSONObject obj = new JSONObject();
         try {
             MemoryMXBean mem = ManagementFactory.getMemoryMXBean();
-
+            JSONObject heapObj = new JSONObject();
             JSONArray heapPools = new JSONArray();
+            JSONObject noHeapObj = new JSONObject();
             JSONArray noHeapPools = new JSONArray();
 
             MemoryUsage heapMemoryUsage = mem.getHeapMemoryUsage();
-            obj.put("jvm.heap.init", heapMemoryUsage.getInit() / Kb);
-            obj.put("jvm.heap.used", heapMemoryUsage.getUsed() / Kb);
-            obj.put("jvm.heap.max", heapMemoryUsage.getMax() / Kb);
-            obj.put("jvm.heap.committed", heapMemoryUsage.getCommitted() / Kb);
+            heapObj.put("init", heapMemoryUsage.getInit() / unit);
+            heapObj.put("used", heapMemoryUsage.getUsed() / unit);
+            heapObj.put("max", heapMemoryUsage.getMax() / unit);
+            heapObj.put("committed", heapMemoryUsage.getCommitted() / unit);
 
 
             MemoryUsage nonHeapMemoryUsage = mem.getNonHeapMemoryUsage();
-            obj.put("jvm.nonheap.init", nonHeapMemoryUsage.getInit() / Kb);
-            obj.put("jvm.nonheap.used", nonHeapMemoryUsage.getUsed() / Kb);
-            obj.put("jvm.nonheap.committed", nonHeapMemoryUsage.getCommitted() / Kb);
-            obj.put("jvm.nonheap.max", nonHeapMemoryUsage.getMax() / Kb);
+            noHeapObj.put("init", nonHeapMemoryUsage.getInit() / unit);
+            noHeapObj.put("used", nonHeapMemoryUsage.getUsed() / unit);
+            noHeapObj.put("committed", nonHeapMemoryUsage.getCommitted() / unit);
+            noHeapObj.put("max", nonHeapMemoryUsage.getMax() / unit);
 
 
             for (MemoryPoolMXBean pool : ManagementFactory.getMemoryPoolMXBeans()) {
                 final MemoryUsage usage = pool.getUsage();
                 JSONObject poolObj = new JSONObject();
                 poolObj.put("name",pool.getName());
-                poolObj.put("init",usage.getInit() / Kb);
-                poolObj.put("used",usage.getUsed() / Kb);
-                poolObj.put("committed",usage.getCommitted() / Kb);
-                poolObj.put("max",usage.getMax() / Kb);
+                poolObj.put("init",usage.getInit() / unit);
+                poolObj.put("used",usage.getUsed() / unit);
+                poolObj.put("committed",usage.getCommitted() / unit);
+                poolObj.put("max",usage.getMax() / unit);
                 if (MemoryType.HEAP == pool.getType()) {
                     heapPools.add(poolObj);
                 } else {
@@ -93,8 +96,11 @@ public class JVMInfoServiceImpl implements JVMInfoService {
                 }
             }
 
-            obj.put("jvm.heap.pools",heapPools);
-            obj.put("jvm.noheap.pools",noHeapPools);
+            heapObj.put("pools",heapPools);
+            noHeapObj.put("pools",noHeapPools);
+
+            obj.put("heap",heapObj);
+            obj.put("noheap",noHeapObj);
 
         } catch (Exception e) {
             obj.put("exception", e.getMessage());
@@ -137,16 +143,14 @@ public class JVMInfoServiceImpl implements JVMInfoService {
         JSONObject obj = new JSONObject();
         obj.put("runtime",getRuntime());
         obj.put("os",getOS());
-        obj.put("mem",getMem());
+        obj.put("mem",getMem(UnitMb));
         obj.put("thread",getThread());
         obj.put("load",getLoad());
         obj.put("timestamp",new Date().getTime());
         return obj;
     }
 
-    protected String printSizeInKb(double size) {
-        return fmtI.format((long) (size / 1024)) + " kbytes";
-    }
+
 
     protected String toDuration(double uptime) {
         uptime /= 1000;
