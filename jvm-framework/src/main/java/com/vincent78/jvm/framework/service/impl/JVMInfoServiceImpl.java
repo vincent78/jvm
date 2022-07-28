@@ -2,6 +2,7 @@ package com.vincent78.jvm.framework.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.vincent78.jvm.framework.model.MemObj;
 import com.vincent78.jvm.framework.service.JVMInfoService;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Locale;
 
 
@@ -22,6 +24,10 @@ public class JVMInfoServiceImpl implements JVMInfoService {
     private final int UnitKb = 1024;
 
     private final int UnitMb = UnitKb * 1024;
+
+    private final LinkedList<MemObj> heapContainer = new LinkedList<>();
+
+    private final LinkedList<byte[]> noHeapContainer = new LinkedList<>();
 
     //获取JVM的启动时间，版本及名称，当前进程ID,环境变量等
     public JSONObject getRuntime() {
@@ -84,11 +90,11 @@ public class JVMInfoServiceImpl implements JVMInfoService {
             for (MemoryPoolMXBean pool : ManagementFactory.getMemoryPoolMXBeans()) {
                 final MemoryUsage usage = pool.getUsage();
                 JSONObject poolObj = new JSONObject();
-                poolObj.put("name",pool.getName());
-                poolObj.put("init",usage.getInit() / unit);
-                poolObj.put("used",usage.getUsed() / unit);
-                poolObj.put("committed",usage.getCommitted() / unit);
-                poolObj.put("max",usage.getMax() / unit);
+                poolObj.put("name", pool.getName());
+                poolObj.put("init", usage.getInit() / unit);
+                poolObj.put("used", usage.getUsed() / unit);
+                poolObj.put("committed", usage.getCommitted() / unit);
+                poolObj.put("max", usage.getMax() / unit);
                 if (MemoryType.HEAP == pool.getType()) {
                     heapPools.add(poolObj);
                 } else {
@@ -96,11 +102,11 @@ public class JVMInfoServiceImpl implements JVMInfoService {
                 }
             }
 
-            heapObj.put("pools",heapPools);
-            noHeapObj.put("pools",noHeapPools);
+            heapObj.put("pools", heapPools);
+            noHeapObj.put("pools", noHeapPools);
 
-            obj.put("heap",heapObj);
-            obj.put("noheap",noHeapObj);
+            obj.put("heap", heapObj);
+            obj.put("noheap", noHeapObj);
 
         } catch (Exception e) {
             obj.put("exception", e.getMessage());
@@ -141,16 +147,37 @@ public class JVMInfoServiceImpl implements JVMInfoService {
 
     public JSONObject summary() {
         JSONObject obj = new JSONObject();
-        obj.put("runtime",getRuntime());
-        obj.put("os",getOS());
-        obj.put("mem",getMem(UnitMb));
-        obj.put("thread",getThread());
-        obj.put("load",getLoad());
-        obj.put("timestamp",new Date().getTime());
+        obj.put("runtime", getRuntime());
+        obj.put("os", getOS());
+        obj.put("mem", getMem(UnitKb));
+        obj.put("thread", getThread());
+        obj.put("load", getLoad());
+        obj.put("timestamp", new Date().getTime());
         return obj;
     }
 
+    public JSONObject addMem(int size) {
 
+        for (int i = 0; i < size; i++) {
+            heapContainer.add(MemObj.generate(UnitKb));
+        }
+        return getMem(UnitKb);
+    }
+
+    public JSONObject subtractMem(int size) {
+        int n = size;
+        if (size > heapContainer.size()) {
+            n = heapContainer.size();
+        }
+        for (int i = 0; i < n; i++) {
+            heapContainer.remove(0);
+        }
+        return getMem(UnitKb);
+    }
+
+    public void gc() {
+        System.gc();
+    }
 
     protected String toDuration(double uptime) {
         uptime /= 1000;
